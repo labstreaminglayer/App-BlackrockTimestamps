@@ -11,7 +11,8 @@ CHAN_FORMAT = pylsl.cf_int32
 SOURCE_ID = 'CEREBUS000'
 
 print("Connecting to Blackrock device...")
-cbpy.open()
+conn_params = cbpy.defaultConParams()
+cbpy.open(parameter=conn_params)
 
 print("Creating LSL Outlet")
 outlet_info = pylsl.StreamInfo(name=STREAM_NAME, type=TYPE, channel_count=len(CHANNEL_NAMES),
