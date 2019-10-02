@@ -31,6 +31,7 @@ try:
     while True:
         while (pylsl.local_clock() - start_time) < (n_samples * target_isi):
             time.sleep(0.1/SYNC_RATE)
+        cbpy.trial_config(reset=True, noevent=True, nocontinuous=True, nocomment=True)
         res, ts = cbpy.time()
         lsl_stamp = pylsl.local_clock()
         outlet.push_sample([int(ts)], timestamp=lsl_stamp)
