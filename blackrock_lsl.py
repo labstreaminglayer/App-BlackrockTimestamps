@@ -16,7 +16,7 @@ cbpy.open(parameter=conn_params)
 
 print("Creating LSL Outlet")
 outlet_info = pylsl.StreamInfo(name=STREAM_NAME, type=TYPE, channel_count=len(CHANNEL_NAMES),
-                               nominal_srate=SYNC_RATE, channel_format=CHAN_FORMAT, source_id=SOURCE_ID)
+                               nominal_srate=pylsl.IRREGULAR_RATE, channel_format=CHAN_FORMAT, source_id=SOURCE_ID)
 outlet_info.desc().append_child_value("manufacturer", "Blackrock")
 channels = outlet_info.desc().append_child("channels")
 for c in CHANNEL_NAMES:
