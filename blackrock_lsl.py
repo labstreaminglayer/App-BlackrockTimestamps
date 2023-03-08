@@ -1,14 +1,19 @@
-from cerebus import cbpy
-import pylsl
+import platform
+import struct
 import time
+
+
+import numpy as np
+import pylsl
+from cerebus import cbpy
 
 
 STREAM_NAME = 'BlackrockTimestamps'
 TYPE = 'sync'
-CHANNEL_NAMES = ['Timestamps']
 SYNC_RATE = 5  # Hz
-CHAN_FORMAT = pylsl.cf_int32
 SOURCE_ID = 'CEREBUS000'
+CHANNEL_NAMES = ['TsHigh32', 'TsLow32']
+CHAN_FORMAT = pylsl.cf_int32
 
 print("Connecting to Blackrock device...")
 conn_params = cbpy.defaultConParams()
@@ -24,17 +29,20 @@ for c in CHANNEL_NAMES:
 outlet = pylsl.StreamOutlet(outlet_info)
 
 print("Sending timestamps...")
+start_time = pylsl.local_clock()
+n_samples = 0
+target_isi = 1 / SYNC_RATE
+ts_arr = np.zeros((1,), dtype=np.uint64)
+view_32 = ts_arr.view(np.int32)
 try:
-    start_time = pylsl.local_clock()
-    n_samples = 0
-    target_isi = 1 / SYNC_RATE
     while True:
         while (pylsl.local_clock() - start_time) < (n_samples * target_isi):
             time.sleep(0.1/SYNC_RATE)
         cbpy.trial_config(reset=True, noevent=True, nocontinuous=True, nocomment=True)
         res, ts = cbpy.time()
-        lsl_stamp = pylsl.local_clock()
-        outlet.push_sample([int(ts)], timestamp=lsl_stamp)
+        ts_lsl = pylsl.local_clock()
+        ts_arr[0] = ts
+        outlet.push_sample(view_32, timestamp=ts_lsl)
         n_samples += 1
 except KeyboardInterrupt:
     print("Terminating...")
