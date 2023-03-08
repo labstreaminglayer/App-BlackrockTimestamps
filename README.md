@@ -20,15 +20,16 @@ See the accompanying test.py script for a more detailed example.
 
 ## Requirements
 
-* Python 3.9 environment with numpy, PyQt6
-    * `conda create -n br_lsl python=3.9`
+* Python 3.9 environment with numpy.
+    * `conda create -n br_lsl python=3.9 numpy`
     * `conda activate br_lsl`
-    * If you need to modify cerebus.cbpy and build, you also need Qt and cython
+    * If you need to modify cerebus.cbpy and build, you also need Qt6 and cython
         * `conda install pyqt cython`
     * If you want to run the test script then you also need a few more packages
-        * `conda install numpy scipy matplotlib`
+        * `conda install scipy matplotlib`
 * [pylsl](https://github.com/labstreaminglayer/pylsl)
     * `pip install pylsl`
+    * On non-Windows platforms you will need to separately install [liblsl](https://github.com/sccn/liblsl/releases). For most users, this is easiest with [conda-forge](https://anaconda.org/conda-forge/liblsl) or [homebrew](https://github.com/labstreaminglayer/homebrew-tap).
 * [cerebus.cbpy](https://github.com/CerebusOSS/CereLink)
     * Windows: `pip install https://github.com/CerebusOSS/CereLink/releases/download/v7.5.1b3/cerebus-0.0.5-cp39-cp39-win_amd64.whl`
     * MacOS ARM: `pip install https://github.com/CerebusOSS/CereLink/releases/download/v7.5.1b3/cerebus-0.0.5-cp39-cp39-macosx_11_0_arm64.whl`
