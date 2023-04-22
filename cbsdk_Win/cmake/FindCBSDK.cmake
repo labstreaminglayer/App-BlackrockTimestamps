@@ -84,9 +84,6 @@ if(CBSDK_FOUND)
             IMPORTED_IMPLIB ${CBSDK_ROOT}/lib/cbsdk${TARGET_PLATFORM}.lib
             VERSION ${proto_ver_major}.${proto_ver_minor}
     )
-
-
-    
 endif(CBSDK_FOUND)
 
 mark_as_advanced(
