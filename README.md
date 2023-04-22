@@ -6,4 +6,4 @@ This approach of re-streaming timestamps only was chosen over re-streaming the d
 
 See the `cbpy` folder for a Python script that is compatible with Cerebus / Neuroport firmware 7.5.x via CereLink's cbpy.
 
-See the `cbsdk_6.05_Win` folder for a C++ application that is compatible with Cerebus / Neuroport firmware 6.05 via cbsdk targeting that platform, for Windows only.
+See the `cbsdk_Win` folder for a C++ application that is compatible with Cerebus / Neuroport firmware via cbsdk, for Windows only.
