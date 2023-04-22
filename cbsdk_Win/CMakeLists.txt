@@ -13,23 +13,34 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED On)
 
 # Dependencies
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	set(TARGET_PLATFORM amd64)
+elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+	set(TARGET_PLATFORM i386)
+endif()
+include(FetchContent)
+
+## Prefetch
+FetchContent_Populate(
+		lsl_pkg
+		URL        "https://github.com/sccn/liblsl/releases/download/v1.16.1/liblsl-1.16.1-Win_${TARGET_PLATFORM}.zip"
+		SOURCE_DIR liblsl
+)
+FetchContent_Declare(
+		cxxopts
+		GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
+		GIT_TAG        v3.1.1
+		GIT_SHALLOW    TRUE
+)
+set(CXXOPTS_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(CXXOPTS_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(CXXOPTS_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+set(CXXOPTS_ENABLE_WARNINGS OFF CACHE BOOL "" FORCE)
 
 ## Threads
 find_package(Threads REQUIRED)
 
 ## LSL
-include(FetchContent)
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(TARGET_PLATFORM amd64)
-elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(TARGET_PLATFORM i386)
-endif()
-FetchContent_Populate(
-  lsl_pkg
-  URL        "https://github.com/sccn/liblsl/releases/download/v1.16.1/liblsl-1.16.1-Win_${TARGET_PLATFORM}.zip"
-  SOURCE_DIR liblsl
-)
-
 find_package(LSL REQUIRED
     HINTS
         ${LSL_INSTALL_ROOT}
@@ -39,8 +50,13 @@ find_package(LSL REQUIRED
         share/LSL
 )
 
+## cxxopts
+FetchContent_MakeAvailable(cxxopts)
+
 ## cbsdk
 find_package(CBSDK REQUIRED)
+get_target_property(cbsdk_proto_ver CBSDK::cbsdk VERSION)
+string(SUBSTRING ${cbsdk_proto_ver} 0 1 cbsdk_proto_ver_major)
 
 # Targets
 add_executable(${PROJECT_NAME})
@@ -49,11 +65,16 @@ target_sources(${PROJECT_NAME} PRIVATE
     src/main.cpp
 )
 
+if(${cbsdk_proto_ver_major} GREATER 3)
+	# Protocol 4 introduced cbPKT_HEADER and 64-bit timestamps
+	target_compile_definitions(${PROJECT_NAME} PUBLIC CBSDK_PROTO_4)
+endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
     Threads::Threads
     LSL::lsl
+	cxxopts
 	CBSDK::cbsdk
 )
 

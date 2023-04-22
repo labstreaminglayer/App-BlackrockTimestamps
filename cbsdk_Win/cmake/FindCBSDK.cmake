@@ -67,14 +67,25 @@ find_package_handle_standard_args(CBSDK
 if(CBSDK_FOUND)
     set(CBSDK_LIBRARIES cbsdk${TARGET_PLATFORM})
     set(CBSDK_INCLUDE_DIRS ${CBSDK_INCLUDE_DIR})
-    
+
+    # Get version from cbhwlib.h cbVERSION_MAJOR.cbVERSION_MINOR
+    #  Technically, this is the protocl version, not the library version.
+    file(READ "${CBSDK_INCLUDE_DIR}/cbhwlib.h" cbhw)
+    string(REGEX MATCH "cbVERSION_MAJOR +([0-9]+)" proto_ver_major ${cbhw})
+    set(proto_ver_major ${CMAKE_MATCH_1})
+    string(REGEX MATCH "cbVERSION_MINOR +([0-9]+)" _ ${cbhw})
+    set(proto_ver_minor ${CMAKE_MATCH_1})
+
     add_library(CBSDK::cbsdk SHARED IMPORTED)
     set_target_properties(CBSDK::cbsdk
         PROPERTIES
             IMPORTED_LOCATION ${CBSDK_ROOT}/lib/cbsdk${TARGET_PLATFORM}.dll  # The dll
             INTERFACE_INCLUDE_DIRECTORIES ${CBSDK_INCLUDE_DIRS}
             IMPORTED_IMPLIB ${CBSDK_ROOT}/lib/cbsdk${TARGET_PLATFORM}.lib
+            VERSION ${proto_ver_major}.${proto_ver_minor}
     )
+
+
     
 endif(CBSDK_FOUND)
 

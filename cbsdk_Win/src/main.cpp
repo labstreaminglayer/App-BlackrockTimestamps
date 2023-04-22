@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <chrono>
 #include <thread>
+#include <cxxopts.hpp>
 //#include <stdlib.h>
 
 using namespace std::chrono_literals;
@@ -17,7 +18,11 @@ void heartbeat_lsl_callback(uint32_t nInstance, const cbSdkPktType type, const v
 {
     auto* pOutlet = (lsl::stream_outlet*)pCallbackData;
     auto* pPkt = (cbPKT_SYSHEARTBEAT*)pEventData;
+#ifdef CBSDK_PROTO_4
+    memcpy(sample, &pPkt->cbpkt_header.time, sizeof(pPkt->cbpkt_header.time));
+#else
     sample[1] = pPkt->time;
+#endif  // CBSDK_PROTO_4
     pOutlet->push_sample(sample);
 }
 
@@ -27,6 +32,8 @@ void stream_from_device() {
 		// instantiate sensor
 		std::cout << "initializing cbsdk connection..." << std::endl;
         uint32_t nInstance = 0;
+        cbSdkConnection con = cbSdkConnection();
+
         cbSdkResult res = cbSdkOpen(
                 nInstance,
                 CBSDKCONNECTION_DEFAULT
@@ -71,6 +78,16 @@ void stream_from_device() {
 }
 
 int main(int argc, char* argv[]) {
+    cxxopts::Options options("BlackrockTimestampsLSL", "Retrieve timestamps from Blackrock hardware and re-stream over LSL outlet.");
+    options.add_options()
+            ("d,debug", "Enable debugging") // a bool parameter
+            ("i,integer", "Int param", cxxopts::value<int>())
+            ("f,file", "File name", cxxopts::value<std::string>())
+            ("v,verbose", "Verbose output", cxxopts::value<bool>()->default_value("false"))
+            ;
+    auto result = options.parse(argc, argv);
+    // result["opt"].as<type>()
+
 	try {
 		// for now stream from the 0'th sensor
 		stream_from_device();
