@@ -1,4 +1,4 @@
-# BlackrockTimestamps over cbsdk 6.05 Windows
+# BlackrockTimestamps over cbsdk on Windows
 
 See the top-level [README](#../README.md) for the motivation behind this application.
 
